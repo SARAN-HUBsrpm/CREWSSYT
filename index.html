@@ -23,14 +23,24 @@
 
     <div class="space-y-4 max-w-xl">
 
+        <!-- Roblox Name -->
         <input id="roblox-name"
             class="w-full p-3 rounded bg-black border border-gray-700"
             placeholder="ชื่อ Roblox (@xxx)">
 
+        <!-- Bounty -->
         <input id="bounty"
             class="w-full p-3 rounded bg-black border border-gray-700"
             placeholder="Bounty">
 
+        <!-- ⭐ เพิ่มช่องใหม่ -->
+        <input id="test-wins"
+            type="number"
+            min="0"
+            class="w-full p-3 rounded bg-black border border-gray-700"
+            placeholder="เทสชนะกี่รอบ (เช่น 5)">
+
+        <!-- Sliders -->
         <div id="sliders"></div>
 
         <div class="text-xl font-bold">
@@ -55,8 +65,7 @@
 
     const DISCORD_ROLE_ID = "1439369148529512488";
 
-    const WEBHOOK_COOLDOWN = 10; // วินาที
-
+    const WEBHOOK_COOLDOWN = 10;
     let lastSendTime = 0;
 
 
@@ -103,25 +112,20 @@
     });
 
 
-    // ================= SCORE SYSTEM =================
+    // ================= SCORE =================
 
     function updateScore(key, value) {
-
         document.getElementById("val-" + key).innerText = value;
-
         updateTotal();
     }
-
 
     function updateTotal() {
 
         let total = 0;
 
         CATEGORIES.forEach(cat => {
-
             const value =
                 Number(document.getElementById("val-" + cat.key).innerText);
-
             total += value;
         });
 
@@ -129,16 +133,13 @@
     }
 
 
-    // ================= DISCORD WEBHOOK SEND =================
+    // ================= DISCORD SEND =================
 
     async function sendToDiscord(record) {
 
         const now = Date.now();
 
-        if (now - lastSendTime < WEBHOOK_COOLDOWN * 1000) {
-            console.log("Webhook cooldown active");
-            return;
-        }
+        if (now - lastSendTime < WEBHOOK_COOLDOWN * 1000) return;
 
         lastSendTime = now;
 
@@ -146,103 +147,50 @@
 
             await fetch(DISCORD_WEBHOOK, {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
+                headers: { "Content-Type": "application/json" },
+
                 body: JSON.stringify({
 
                     content: `<@&${DISCORD_ROLE_ID}>`,
 
-                    embeds: [
-                        {
-                            title: "📋 ผลการเทสเข้าแคลน",
+                    embeds: [{
+                        title: "📋 ผลการเทสเข้าแคลน",
 
-                            color:
-                                record.passed
-                                    ? 0x00ff88
-                                    : 0xff2d55,
+                        color: record.passed ? 0x00ff88 : 0xff2d55,
 
-                            fields: [
+                        fields: [
 
-                                {
-                                    name: "👤 ผู้เล่น",
-                                    value: record.roblox_name,
-                                    inline: true
-                                },
+                            { name: "👤 ผู้เล่น", value: record.roblox_name, inline: true },
+                            { name: "💰 Bounty", value: record.bounty, inline: true },
 
-                                {
-                                    name: "💰 Bounty",
-                                    value: record.bounty,
-                                    inline: true
-                                },
+                            // ⭐ เพิ่มตรงนี้
+                            { name: "🏆 ชนะการเทส", value: record.test_wins + " รอบ", inline: true },
 
-                                {
-                                    name: "🎯 คะแนนรวม",
-                                    value: record.total + " / 100"
-                                },
+                            { name: "🎯 คะแนนรวม", value: record.total + " / 100" },
 
-                                {
-                                    name: "👁️ เคน",
-                                    value: String(record.score_ken),
-                                    inline: true
-                                },
+                            { name: "👁️ เคน", value: String(record.score_ken), inline: true },
+                            { name: "🔮 โซติดตัว", value: String(record.score_observation), inline: true },
+                            { name: "🎯 สกิล", value: String(record.score_skill), inline: true },
+                            { name: "🛡️ เอาตัวรอด", value: String(record.score_survival), inline: true },
+                            { name: "💎 ใช้ของ", value: String(record.score_resource), inline: true },
+                            { name: "⚡ คอมโบ", value: String(record.score_combo), inline: true },
+                            { name: "🧠 ตัดสินใจ", value: String(record.score_decision), inline: true },
 
-                                {
-                                    name: "🔮 โซติดตัว",
-                                    value: String(record.score_observation),
-                                    inline: true
-                                },
+                            {
+                                name: "📊 ผลลัพธ์",
+                                value: record.passed ? "✅ ผ่าน" : "❌ ไม่ผ่าน"
+                            }
 
-                                {
-                                    name: "🎯 สกิล",
-                                    value: String(record.score_skill),
-                                    inline: true
-                                },
+                        ],
 
-                                {
-                                    name: "🛡️ เอาตัวรอด",
-                                    value: String(record.score_survival),
-                                    inline: true
-                                },
-
-                                {
-                                    name: "💎 ใช้ของ",
-                                    value: String(record.score_resource),
-                                    inline: true
-                                },
-
-                                {
-                                    name: "⚡ คอมโบ",
-                                    value: String(record.score_combo),
-                                    inline: true
-                                },
-
-                                {
-                                    name: "🧠 ตัดสินใจ",
-                                    value: String(record.score_decision),
-                                    inline: true
-                                },
-
-                                {
-                                    name: "📊 ผลลัพธ์",
-                                    value:
-                                        record.passed
-                                            ? "✅ ผ่าน"
-                                            : "❌ ไม่ผ่าน"
-                                }
-
-                            ],
-
-                            timestamp: new Date().toISOString()
-                        }
-                    ]
+                        timestamp: new Date().toISOString()
+                    }]
 
                 })
             });
 
         } catch (err) {
-
-            console.log("Discord Error", err);
+            console.log(err);
         }
     }
 
@@ -258,6 +206,9 @@
 
         const bounty =
             document.getElementById("bounty").value.trim();
+
+        const testWins =
+            document.getElementById("test-wins").value || 0;
 
         if (!name || !bounty) {
             alert("กรอกข้อมูลให้ครบก่อน");
@@ -277,14 +228,11 @@
         });
 
         const record = {
-
             roblox_name: name,
             bounty: bounty,
+            test_wins: testWins,
             total: total,
-
-            passed:
-                total >= PASS_THRESHOLD,
-
+            passed: total >= PASS_THRESHOLD,
             ...scores
         };
 
