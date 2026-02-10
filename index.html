@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SSYT PAINFUL1 Test</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        body {
+            background: #0a0a12;
+            color: white;
+            font-family: Kanit, sans-serif;
+        }
+    </style>
+</head>
+
+<body class="p-6">
+
+    <h1 class="text-3xl font-bold mb-6">📋 ระบบเทสเข้าแคลน</h1>
+
+    <div class="space-y-4 max-w-xl">
+
+        <input id="roblox-name"
+            class="w-full p-3 rounded bg-black border border-gray-700"
+            placeholder="ชื่อ Roblox (@xxx)">
+
+        <input id="bounty"
+            class="w-full p-3 rounded bg-black border border-gray-700"
+            placeholder="Bounty">
+
+        <div id="sliders"></div>
+
+        <div class="text-xl font-bold">
+            คะแนนรวม :
+            <span id="total">0</span> / 100
+        </div>
+
+        <button onclick="handleSubmit(event)"
+            class="w-full p-4 bg-red-600 rounded font-bold">
+            บันทึก
+        </button>
+
+    </div>
+
+
+<script>
+
+    // ================= DISCORD CONFIG =================
+
+    const DISCORD_WEBHOOK =
+        "https://discord.com/api/webhooks/1470701672174190675/7sZp7dNpq0gJ3un7TY8w6-zVCsohiZ7YNoH9iW6J8D9aompqsREkdfvlGE5LiskRzEhE";
+
+    const DISCORD_ROLE_ID = "1439369148529512488";
+
+    const WEBHOOK_COOLDOWN = 10; // วินาที
+
+    let lastSendTime = 0;
+
+
+    // ================= CATEGORY CONFIG =================
+
+    const PASS_THRESHOLD = 41;
+
+    const CATEGORIES = [
+        { key: "score_ken",         label: "👁️ เคน",         max: 8  },
+        { key: "score_observation", label: "🔮 โซติดตัว",     max: 17 },
+        { key: "score_skill",       label: "🎯 สกิลแม่น",     max: 14 },
+        { key: "score_survival",    label: "🛡️ เอาตัวรอด",   max: 14 },
+        { key: "score_resource",    label: "💎 ใช้ของคุ้ม",  max: 14 },
+        { key: "score_combo",       label: "⚡ คอมโบ",        max: 16 },
+        { key: "score_decision",    label: "🧠 ตัดสินใจ",    max: 17 }
+    ];
+
+
+    // ================= BUILD SLIDERS =================
+
+    const slidersDiv = document.getElementById("sliders");
+
+    CATEGORIES.forEach(cat => {
+
+        const wrapper = document.createElement("div");
+
+        wrapper.innerHTML = `
+            <label class="block mb-1">
+                ${cat.label}
+                (<span id="val-${cat.key}">0</span> / ${cat.max})
+            </label>
+
+            <input
+                type="range"
+                min="0"
+                max="${cat.max}"
+                value="0"
+                class="w-full"
+                oninput="updateScore('${cat.key}', this.value)"
+            >
+        `;
+
+        slidersDiv.appendChild(wrapper);
+    });
+
+
+    // ================= SCORE SYSTEM =================
+
+    function updateScore(key, value) {
+
+        document.getElementById("val-" + key).innerText = value;
+
+        updateTotal();
+    }
+
+
+    function updateTotal() {
+
+        let total = 0;
+
+        CATEGORIES.forEach(cat => {
+
+            const value =
+                Number(document.getElementById("val-" + cat.key).innerText);
+
+            total += value;
+        });
+
+        document.getElementById("total").innerText = total;
+    }
+
+
+    // ================= DISCORD WEBHOOK SEND =================
+
+    async function sendToDiscord(record) {
+
+        const now = Date.now();
+
+        if (now - lastSendTime < WEBHOOK_COOLDOWN * 1000) {
+            console.log("Webhook cooldown active");
+            return;
+        }
+
+        lastSendTime = now;
+
+        try {
+
+            await fetch(DISCORD_WEBHOOK, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+
+                    content: `<@&${DISCORD_ROLE_ID}>`,
+
+                    embeds: [
+                        {
+                            title: "📋 ผลการเทสเข้าแคลน",
+
+                            color:
+                                record.passed
+                                    ? 0x00ff88
+                                    : 0xff2d55,
+
+                            fields: [
+
+                                {
+                                    name: "👤 ผู้เล่น",
+                                    value: record.roblox_name,
+                                    inline: true
+                                },
+
+                                {
+                                    name: "💰 Bounty",
+                                    value: record.bounty,
+                                    inline: true
+                                },
+
+                                {
+                                    name: "🎯 คะแนนรวม",
+                                    value: record.total + " / 100"
+                                },
+
+                                {
+                                    name: "👁️ เคน",
+                                    value: String(record.score_ken),
+                                    inline: true
+                                },
+
+                                {
+                                    name: "🔮 โซติดตัว",
+                                    value: String(record.score_observation),
+                                    inline: true
+                                },
+
+                                {
+                                    name: "🎯 สกิล",
+                                    value: String(record.score_skill),
+                                    inline: true
+                                },
+
+                                {
+                                    name: "🛡️ เอาตัวรอด",
+                                    value: String(record.score_survival),
+                                    inline: true
+                                },
+
+                                {
+                                    name: "💎 ใช้ของ",
+                                    value: String(record.score_resource),
+                                    inline: true
+                                },
+
+                                {
+                                    name: "⚡ คอมโบ",
+                                    value: String(record.score_combo),
+                                    inline: true
+                                },
+
+                                {
+                                    name: "🧠 ตัดสินใจ",
+                                    value: String(record.score_decision),
+                                    inline: true
+                                },
+
+                                {
+                                    name: "📊 ผลลัพธ์",
+                                    value:
+                                        record.passed
+                                            ? "✅ ผ่าน"
+                                            : "❌ ไม่ผ่าน"
+                                }
+
+                            ],
+
+                            timestamp: new Date().toISOString()
+                        }
+                    ]
+
+                })
+            });
+
+        } catch (err) {
+
+            console.log("Discord Error", err);
+        }
+    }
+
+
+    // ================= SUBMIT =================
+
+    function handleSubmit(e) {
+
+        e.preventDefault();
+
+        const name =
+            document.getElementById("roblox-name").value.trim();
+
+        const bounty =
+            document.getElementById("bounty").value.trim();
+
+        if (!name || !bounty) {
+            alert("กรอกข้อมูลให้ครบก่อน");
+            return;
+        }
+
+        let total = 0;
+        let scores = {};
+
+        CATEGORIES.forEach(cat => {
+
+            const value =
+                Number(document.getElementById("val-" + cat.key).innerText);
+
+            scores[cat.key] = value;
+            total += value;
+        });
+
+        const record = {
+
+            roblox_name: name,
+            bounty: bounty,
+            total: total,
+
+            passed:
+                total >= PASS_THRESHOLD,
+
+            ...scores
+        };
+
+        sendToDiscord(record);
+
+        alert("✅ ส่ง Discord แล้ว");
+    }
+
+</script>
+
+</body>
+</html>
