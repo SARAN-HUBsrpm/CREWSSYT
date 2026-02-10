@@ -1,763 +1,299 @@
-<!doctype html>
-<html lang="th" class="h-full">
- <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SSYT PAINFUL1 - Test Clan</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="/_sdk/element_sdk.js"></script>
-  <script src="/_sdk/data_sdk.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700;800;900&amp;family=Orbitron:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet">
-  <style>
-    body {
-      box-sizing: border-box;
-      font-family: 'Kanit', sans-serif;
-    }
+<!DOCTYPE html>
+<html lang="th">
 
-    :root {
-      --bg-dark: #0a0a12;
-      --surface: #13132b;
-      --text-color: #e8e6f0;
-      --accent-red: #ff2d55;
-      --accent-cyan: #00e5ff;
-    }
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SSYT PAINFUL1 Test</title>
 
-    .glow-red {
-      box-shadow: 0 0 20px rgba(255, 45, 85, 0.3), 0 0 60px rgba(255, 45, 85, 0.1);
-    }
+    <script src="https://cdn.tailwindcss.com"></script>
 
-    .glow-cyan {
-      box-shadow: 0 0 20px rgba(0, 229, 255, 0.3), 0 0 60px rgba(0, 229, 255, 0.1);
-    }
+    <style>
+        body {
+            background: #0a0a12;
+            color: white;
+            font-family: Kanit, sans-serif;
+        }
+    </style>
+</head>
 
-    .glow-green {
-      box-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
-    }
+<body class="p-6">
 
-    @keyframes slideUp {
-      from { opacity: 0; transform: translateY(30px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
+    <h1 class="text-3xl font-bold mb-6">📋 ระบบเทสเข้าแคลน</h1>
 
-    @keyframes pulseGlow {
-      0%, 100% { opacity: 0.6; }
-      50% { opacity: 1; }
-    }
+    <div class="space-y-4 max-w-xl">
 
-    @keyframes scanline {
-      0% { transform: translateY(-100%); }
-      100% { transform: translateY(100%); }
-    }
+        <input id="roblox-name"
+            class="w-full p-3 rounded bg-black border border-gray-700"
+            placeholder="ชื่อ Roblox (@xxx)">
 
-    .animate-slide-up {
-      animation: slideUp 0.6s ease-out forwards;
-    }
+        <input id="bounty"
+            class="w-full p-3 rounded bg-black border border-gray-700"
+            placeholder="Bounty">
 
-    .animate-delay-1 { animation-delay: 0.1s; opacity: 0; }
-    .animate-delay-2 { animation-delay: 0.2s; opacity: 0; }
-    .animate-delay-3 { animation-delay: 0.3s; opacity: 0; }
-    .animate-delay-4 { animation-delay: 0.4s; opacity: 0; }
+        <div id="sliders"></div>
 
-    .score-slider::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      appearance: none;
-      width: 20px;
-      height: 20px;
-      border-radius: 50%;
-      background: var(--accent-cyan);
-      cursor: pointer;
-      box-shadow: 0 0 10px rgba(0, 229, 255, 0.5);
-    }
+        <div class="text-xl font-bold">
+            คะแนนรวม :
+            <span id="total">0</span> / 100
+        </div>
 
-    .score-slider::-moz-range-thumb {
-      width: 20px;
-      height: 20px;
-      border-radius: 50%;
-      background: var(--accent-cyan);
-      cursor: pointer;
-      border: none;
-      box-shadow: 0 0 10px rgba(0, 229, 255, 0.5);
-    }
+        <button onclick="handleSubmit(event)"
+            class="w-full p-4 bg-red-600 rounded font-bold">
+            บันทึก
+        </button>
 
-    .score-slider {
-      -webkit-appearance: none;
-      appearance: none;
-      height: 6px;
-      border-radius: 3px;
-      background: linear-gradient(90deg, #1a1a3e, #2a2a5e);
-      outline: none;
-    }
-
-    .hex-pattern {
-      background-image: radial-gradient(circle at 1px 1px, rgba(0, 229, 255, 0.05) 1px, transparent 0);
-      background-size: 40px 40px;
-    }
-
-    .result-card {
-      backdrop-filter: blur(10px);
-    }
-
-    .toast-container {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      z-index: 9999;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .toast {
-      padding: 12px 20px;
-      border-radius: 8px;
-      color: #fff;
-      font-size: 14px;
-      animation: slideUp 0.3s ease-out;
-      max-width: 320px;
-    }
-
-    .toast-success { background: rgba(0, 255, 136, 0.9); color: #000; }
-    .toast-error { background: rgba(255, 45, 85, 0.9); }
-
-    .tab-active {
-      border-bottom: 3px solid var(--accent-cyan);
-      color: var(--accent-cyan);
-    }
-
-    .delete-confirm-btn {
-      background: #ff2d55;
-      color: white;
-      padding: 4px 12px;
-      border-radius: 6px;
-      font-size: 12px;
-      cursor: pointer;
-      border: none;
-    }
-    .delete-cancel-btn {
-      background: #333;
-      color: #ccc;
-      padding: 4px 12px;
-      border-radius: 6px;
-      font-size: 12px;
-      cursor: pointer;
-      border: none;
-    }
-  </style>
-  <style>@view-transition { navigation: auto; }</style>
- </head>
- <body class="h-full">
-  <div id="app-wrapper" class="h-full w-full overflow-auto hex-pattern" style="background: var(--bg-dark); color: var(--text-color);"><!-- Toast Container -->
-   <div id="toast-container" class="toast-container"></div><!-- Header -->
-   <header class="w-full relative overflow-hidden" style="background: linear-gradient(135deg, #0d0d20 0%, #1a0a2e 50%, #0d0d20 100%);">
-    <div class="absolute inset-0 opacity-20">
-     <div style="position:absolute;top:20%;left:10%;width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,rgba(255,45,85,0.3),transparent 70%)"></div>
-     <div style="position:absolute;top:30%;right:15%;width:150px;height:150px;border-radius:50%;background:radial-gradient(circle,rgba(0,229,255,0.3),transparent 70%)"></div>
     </div>
-    <div class="relative z-10 text-center py-8 px-4">
-     <div class="animate-slide-up">
-      <div class="inline-block mb-3 px-4 py-1 rounded-full text-xs font-medium tracking-widest" style="background:rgba(255,45,85,0.15);border:1px solid rgba(255,45,85,0.3);color:#ff2d55;">
-       ⚔️ BLOX FRUITS
-      </div>
-     </div>
-     <h1 id="main-title" class="animate-slide-up animate-delay-1 text-3xl md:text-5xl font-black tracking-tight mb-2" style="font-family:'Orbitron',sans-serif;background:linear-gradient(135deg,#ff2d55,#ff6b8a,#00e5ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">SSYT PAINFUL1</h1>
-     <p id="sub-title" class="animate-slide-up animate-delay-2 text-base md:text-lg font-light opacity-80">ระบบเทสเข้าแคลน — สาขา 1</p>
-     <div class="animate-slide-up animate-delay-3 mt-4 flex justify-center gap-6 text-xs opacity-60"><span>🏴‍☠️ เกม: Blox Fruits</span>
-     </div>
-    </div>
-   </header><!-- Tabs -->
-   <nav class="w-full flex justify-center gap-0 border-b" style="border-color:rgba(255,255,255,0.08);background:rgba(19,19,43,0.8);"><button id="tab-form" onclick="switchTab('form')" class="tab-active px-6 py-3 text-sm font-medium transition-all duration-200 hover:opacity-80" style="background:none;border:none;cursor:pointer;color:var(--accent-cyan);border-bottom:3px solid var(--accent-cyan);"> 📝 เทสคะแนน </button>
-   </nav><!-- Main Content -->
-   <main class="w-full max-w-2xl mx-auto px-4 py-6"><!-- Form Section -->
-    <section id="section-form">
-     <form id="test-form" onsubmit="return false;" class="space-y-5"><!-- Player Info -->
-      <div class="animate-slide-up animate-delay-2 rounded-xl p-5 space-y-4" style="background:rgba(19,19,43,0.7);border:1px solid rgba(255,255,255,0.06);">
-       <h2 class="text-sm font-bold uppercase tracking-wider flex items-center gap-2" style="color:var(--accent-cyan);"><span>👤</span> ข้อมูลผู้เล่น</h2>
-       <div><label for="roblox-name" class="block text-xs font-medium mb-1.5 opacity-70">ชื่อ Roblox (ใส่ @ นำหน้า)</label> <input type="text" id="roblox-name" placeholder="เช่น @SaranRTDJ" required class="w-full rounded-lg px-4 py-3 text-sm outline-none transition-all duration-200 focus:ring-2" style="background:rgba(10,10,18,0.8);border:1px solid rgba(255,255,255,0.1);color:var(--text-color);--tw-ring-color:rgba(0,229,255,0.4);">
-       </div>
-       <div><label for="bounty" class="block text-xs font-medium mb-1.5 opacity-70">ค่าหัว (Bounty)</label> <input type="text" id="bounty" placeholder="เช่น 28M, 29.9M, 30M" required class="w-full rounded-lg px-4 py-3 text-sm outline-none transition-all duration-200 focus:ring-2" style="background:rgba(10,10,18,0.8);border:1px solid rgba(255,255,255,0.1);color:var(--text-color);--tw-ring-color:rgba(0,229,255,0.4);">
-       </div>
-      </div><!-- Scoring Categories -->
-      <div class="animate-slide-up animate-delay-3 rounded-xl p-5 space-y-5" style="background:rgba(19,19,43,0.7);border:1px solid rgba(255,255,255,0.06);">
-       <h2 class="text-sm font-bold uppercase tracking-wider flex items-center gap-2" style="color:var(--accent-red);"><span>🎯</span> คะแนนการเทส</h2>
-       <p class="text-xs opacity-50">ให้คะแนนการเทส (เลื่อนเพื่อปรับ)</p><!-- Score sliders will be generated by JS -->
-       <div id="score-sliders" class="space-y-4"></div>
-       <div class="flex items-center justify-between pt-3 rounded-lg px-4 py-3" style="background:rgba(0,229,255,0.05);border:1px solid rgba(0,229,255,0.15);"><span class="text-sm font-semibold">คะแนนรวม</span> <span id="total-display" class="text-2xl font-black" style="font-family:'Orbitron',sans-serif;color:var(--accent-cyan);">0</span> <span class="text-xs opacity-50">/ 100</span>
-       </div>
-      </div><!-- Submit --> <button type="submit" id="submit-btn" onclick="handleSubmit(event)" class="w-full py-4 rounded-xl text-base font-bold uppercase tracking-wider transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] glow-red" style="background:linear-gradient(135deg,#ff2d55,#cc1744);color:white;border:none;cursor:pointer;"> บันทึก </button>
-     </form><!-- Live Result Preview -->
-     <div id="result-preview" class="mt-6 hidden">
-     </div>
-    </section><!-- History Section -->
-    <section id="section-history" class="hidden">
-     <div id="history-list" class="space-y-4">
-      <div class="text-center py-12 opacity-40">
-       <div class="text-4xl mb-3">
-        📋
-       </div>
-       <p class="text-sm">ยังไม่มีประวัติการเทส</p>
-      </div>
-     </div>
-    </section>
-   </main><!-- Footer -->
-   <footer class="w-full text-center py-6 text-xs opacity-30">
-    SSYT PAINFUL1 — Blox Fruits Clan Test System
-   </footer>
-  </div>
-  <script>
-    // ========== CONFIG & CONSTANTS ==========
+
+
+<script>
+
+    // ================= DISCORD CONFIG =================
+
+    const DISCORD_WEBHOOK =
+        "https://discord.com/api/webhooks/1470701672174190675/7sZp7dNpq0gJ3un7TY8w6-zVCsohiZ7YNoH9iW6J8D9aompqsREkdfvlGE5LiskRzEhE";
+
+    const DISCORD_ROLE_ID = "1439369148529512488";
+
+    const WEBHOOK_COOLDOWN = 10; // วินาที
+
+    let lastSendTime = 0;
+
+
+    // ================= CATEGORY CONFIG =================
+
     const PASS_THRESHOLD = 41;
+
     const CATEGORIES = [
-      { key: 'score_ken', label: 'การเปิดปิดเคน', emoji: '👁️', max: 8 },
-      { key: 'score_observation', label: 'โซติดตัว', emoji: '🔮', max: 17 },
-      { key: 'score_skill', label: 'สกิลแม่น', emoji: '🎯', max: 14 },
-      { key: 'score_survival', label: 'การเอาตัวรอด', emoji: '🛡️', max: 14 },
-      { key: 'score_resource', label: 'การดึงของใช้ให้คุ้ม', emoji: '💎', max: 14 },
-      { key: 'score_combo', label: 'การคอมโบ', emoji: '⚡', max: 16 },
-      { key: 'score_decision', label: 'การตัดสินใจ', emoji: '🧠', max: 17 }
+        { key: "score_ken",         label: "👁️ เคน",         max: 8  },
+        { key: "score_observation", label: "🔮 โซติดตัว",     max: 17 },
+        { key: "score_skill",       label: "🎯 สกิลแม่น",     max: 14 },
+        { key: "score_survival",    label: "🛡️ เอาตัวรอด",   max: 14 },
+        { key: "score_resource",    label: "💎 ใช้ของคุ้ม",  max: 14 },
+        { key: "score_combo",       label: "⚡ คอมโบ",        max: 16 },
+        { key: "score_decision",    label: "🧠 ตัดสินใจ",    max: 17 }
     ];
 
-    const MAX_TOTAL = CATEGORIES.reduce((s, c) => s + c.max, 0); // 100
 
-    let allRecords = [];
-    let currentTab = 'form';
-    let isSubmitting = false;
+    // ================= BUILD SLIDERS =================
 
-    // ========== ELEMENT SDK ==========
-    const defaultConfig = {
-      clan_name: 'SSYT PAINFUL1',
-      branch_name: 'สาขา 1',
-      page_title: 'ระบบเทสเข้าแคลน',
-      background_color: '#0a0a12',
-      surface_color: '#13132b',
-      text_color: '#e8e6f0',
-      accent_primary: '#ff2d55',
-      accent_secondary: '#00e5ff',
-      font_family: 'Kanit',
-      font_size: 16
-    };
+    const slidersDiv = document.getElementById("sliders");
 
-    function applyConfig(config) {
-      const c = { ...defaultConfig, ...config };
+    CATEGORIES.forEach(cat => {
 
-      // Titles
-      const mainTitle = document.getElementById('main-title');
-      if (mainTitle) mainTitle.textContent = c.clan_name || defaultConfig.clan_name;
+        const wrapper = document.createElement("div");
 
-      const subTitle = document.getElementById('sub-title');
-      if (subTitle) subTitle.textContent = `${c.page_title || defaultConfig.page_title} — ${c.branch_name || defaultConfig.branch_name}`;
-
-      // Colors
-      document.documentElement.style.setProperty('--bg-dark', c.background_color);
-      document.documentElement.style.setProperty('--surface', c.surface_color);
-      document.documentElement.style.setProperty('--text-color', c.text_color);
-      document.documentElement.style.setProperty('--accent-red', c.accent_primary);
-      document.documentElement.style.setProperty('--accent-cyan', c.accent_secondary);
-
-      const wrapper = document.getElementById('app-wrapper');
-      if (wrapper) {
-        wrapper.style.background = c.background_color;
-        wrapper.style.color = c.text_color;
-      }
-
-      // Font
-      const fontStack = `${c.font_family}, Kanit, sans-serif`;
-      document.body.style.fontFamily = fontStack;
-
-      // Font size
-      const base = c.font_size || defaultConfig.font_size;
-      document.querySelectorAll('h1').forEach(el => el.style.fontSize = `${base * 2.2}px`);
-      document.querySelectorAll('h2').forEach(el => el.style.fontSize = `${base * 0.85}px`);
-      document.querySelectorAll('p, span, label, input, button').forEach(el => {
-        if (!el.closest('#total-display') && el.id !== 'total-display') {
-          // Don't override specific styled elements
-        }
-      });
-
-      // Update submit button
-      const submitBtn = document.getElementById('submit-btn');
-      if (submitBtn) {
-        submitBtn.style.background = `linear-gradient(135deg, ${c.accent_primary}, ${adjustColor(c.accent_primary, -30)})`;
-      }
-
-      // Update slider thumbs via CSS
-      updateSliderStyles(c.accent_secondary);
-    }
-
-    function adjustColor(hex, amount) {
-      const num = parseInt(hex.replace('#', ''), 16);
-      const r = Math.min(255, Math.max(0, (num >> 16) + amount));
-      const g = Math.min(255, Math.max(0, ((num >> 8) & 0x00FF) + amount));
-      const b = Math.min(255, Math.max(0, (num & 0x0000FF) + amount));
-      return `#${(1 << 24 | r << 16 | g << 8 | b).toString(16).slice(1)}`;
-    }
-
-    function updateSliderStyles(color) {
-      let style = document.getElementById('dynamic-slider-style');
-      if (!style) {
-        style = document.createElement('style');
-        style.id = 'dynamic-slider-style';
-        document.head.appendChild(style);
-      }
-      style.textContent = `
-        .score-slider::-webkit-slider-thumb {
-          background: ${color};
-          box-shadow: 0 0 10px ${color}66;
-        }
-        .score-slider::-moz-range-thumb {
-          background: ${color};
-          box-shadow: 0 0 10px ${color}66;
-        }
-      `;
-    }
-
-    if (window.elementSdk) {
-      window.elementSdk.init({
-        defaultConfig,
-        onConfigChange: async (config) => {
-          applyConfig(config);
-        },
-        mapToCapabilities: (config) => ({
-          recolorables: [
-            {
-              get: () => config.background_color || defaultConfig.background_color,
-              set: (v) => { config.background_color = v; window.elementSdk.setConfig({ background_color: v }); }
-            },
-            {
-              get: () => config.surface_color || defaultConfig.surface_color,
-              set: (v) => { config.surface_color = v; window.elementSdk.setConfig({ surface_color: v }); }
-            },
-            {
-              get: () => config.text_color || defaultConfig.text_color,
-              set: (v) => { config.text_color = v; window.elementSdk.setConfig({ text_color: v }); }
-            },
-            {
-              get: () => config.accent_primary || defaultConfig.accent_primary,
-              set: (v) => { config.accent_primary = v; window.elementSdk.setConfig({ accent_primary: v }); }
-            },
-            {
-              get: () => config.accent_secondary || defaultConfig.accent_secondary,
-              set: (v) => { config.accent_secondary = v; window.elementSdk.setConfig({ accent_secondary: v }); }
-            }
-          ],
-          borderables: [],
-          fontEditable: {
-            get: () => config.font_family || defaultConfig.font_family,
-            set: (v) => { config.font_family = v; window.elementSdk.setConfig({ font_family: v }); }
-          },
-          fontSizeable: {
-            get: () => config.font_size || defaultConfig.font_size,
-            set: (v) => { config.font_size = v; window.elementSdk.setConfig({ font_size: v }); }
-          }
-        }),
-        mapToEditPanelValues: (config) => new Map([
-          ['clan_name', config.clan_name || defaultConfig.clan_name],
-          ['branch_name', config.branch_name || defaultConfig.branch_name],
-          ['page_title', config.page_title || defaultConfig.page_title]
-        ])
-      });
-    }
-
-    // ========== BUILD SCORE SLIDERS ==========
-    function buildSliders() {
-      const container = document.getElementById('score-sliders');
-      container.innerHTML = '';
-      CATEGORIES.forEach(cat => {
-        const div = document.createElement('div');
-        div.className = 'space-y-1.5';
-        div.innerHTML = `
-          <div class="flex items-center justify-between">
-            <label for="slider-${cat.key}" class="text-sm font-medium">
-              <span class="mr-1.5">${cat.emoji}</span>${cat.label}
+        wrapper.innerHTML = `
+            <label class="block mb-1">
+                ${cat.label}
+                (<span id="val-${cat.key}">0</span> / ${cat.max})
             </label>
-            <div class="flex items-center gap-2">
-              <span id="val-${cat.key}" class="text-lg font-bold" style="font-family:'Orbitron',sans-serif;color:var(--accent-cyan);min-width:28px;text-align:right;">0</span>
-              <span class="text-xs opacity-40">/ ${cat.max}</span>
-            </div>
-          </div>
-          <input type="range" id="slider-${cat.key}" class="score-slider w-full" min="0" max="${cat.max}" value="0"
-            oninput="updateScore('${cat.key}', this.value)">
-          <div class="flex justify-between text-[10px] opacity-30 px-0.5">
-            <span>0</span>
-            <span>${cat.max}</span>
-          </div>
+
+            <input
+                type="range"
+                min="0"
+                max="${cat.max}"
+                value="0"
+                class="w-full"
+                oninput="updateScore('${cat.key}', this.value)"
+            >
         `;
-        container.appendChild(div);
-      });
-    }
+
+        slidersDiv.appendChild(wrapper);
+    });
+
+
+    // ================= SCORE SYSTEM =================
 
     function updateScore(key, value) {
-      const valEl = document.getElementById(`val-${key}`);
-      if (valEl) valEl.textContent = value;
-      updateTotal();
+
+        document.getElementById("val-" + key).innerText = value;
+
+        updateTotal();
     }
+
 
     function updateTotal() {
-      let total = 0;
-      CATEGORIES.forEach(cat => {
-        const slider = document.getElementById(`slider-${cat.key}`);
-        if (slider) total += parseInt(slider.value) || 0;
-      });
-      const totalDisplay = document.getElementById('total-display');
-      if (totalDisplay) {
-        totalDisplay.textContent = total;
-        if (total >= PASS_THRESHOLD) {
-          totalDisplay.style.color = '#00ff88';
-        } else {
-          totalDisplay.style.color = 'var(--accent-red)';
-        }
-      }
-      updateResultPreview(total);
-    }
 
-    function updateResultPreview(total) {
-      const preview = document.getElementById('result-preview');
-      const name = document.getElementById('roblox-name').value.trim();
-      const bounty = document.getElementById('bounty').value.trim();
+        let total = 0;
 
-      if (!name && !bounty) {
-        preview.classList.add('hidden');
-        return;
-      }
-
-      preview.classList.remove('hidden');
-      const passed = total >= PASS_THRESHOLD;
-      const scores = {};
-      CATEGORIES.forEach(cat => {
-        scores[cat.key] = parseInt(document.getElementById(`slider-${cat.key}`).value) || 0;
-      });
-
-      preview.innerHTML = buildResultCard(name, bounty, scores, total, passed, false);
-    }
-
-    function buildResultCard(name, bounty, scores, total, passed, showDelete, record) {
-      const statusColor = passed ? '#00ff88' : '#ff2d55';
-      const statusText = passed ? '✅ ผ่านการเทส' : '❌ ไม่ผ่านการเทส';
-      const statusBg = passed ? 'rgba(0,255,136,0.08)' : 'rgba(255,45,85,0.08)';
-      const statusBorder = passed ? 'rgba(0,255,136,0.2)' : 'rgba(255,45,85,0.2)';
-
-      // Build score breakdown
-      let breakdownHTML = '';
-      const pairChecks = [
-        { keys: ['score_ken', 'score_observation'], label: 'เคน + โซติดตัว', threshold: 25 }
-      ];
-
-      // Individual scores
-      CATEGORIES.forEach(cat => {
-        const val = scores[cat.key] || 0;
-        const pct = (val / cat.max * 100).toFixed(0);
-        const barColor = pct >= 70 ? '#00ff88' : pct >= 40 ? '#ffaa00' : '#ff2d55';
-        breakdownHTML += `
-          <div class="flex items-center gap-3 text-xs">
-            <span class="w-5 text-center">${cat.emoji}</span>
-            <span class="flex-1 opacity-70">${cat.label}</span>
-            <div class="w-20 h-1.5 rounded-full overflow-hidden" style="background:rgba(255,255,255,0.1);">
-              <div class="h-full rounded-full transition-all" style="width:${pct}%;background:${barColor};"></div>
-            </div>
-            <span class="font-bold w-8 text-right" style="color:${barColor};">${val}</span>
-            <span class="opacity-30">/${cat.max}</span>
-          </div>
-        `;
-      });
-
-
-
-      const deleteSection = showDelete && record ? `
-        <div class="mt-3 pt-3 flex justify-end" style="border-top:1px solid rgba(255,255,255,0.05);">
-          <button onclick="confirmDelete('${record.__backendId}')" id="del-btn-${record.__backendId}"
-            class="text-xs px-3 py-1.5 rounded-lg transition-all hover:opacity-80"
-            style="background:rgba(255,45,85,0.1);color:#ff2d55;border:1px solid rgba(255,45,85,0.2);cursor:pointer;">
-            🗑️ ลบ
-          </button>
-        </div>
-      ` : '';
-
-      const testedAt = record && record.tested_at
-        ? `<span class="text-[10px] opacity-30">${new Date(record.tested_at).toLocaleString('th-TH')}</span>`
-        : '';
-
-      return `
-        <div class="result-card rounded-xl p-5 space-y-4" style="background:rgba(19,19,43,0.9);border:1px solid ${statusBorder};">
-          <div class="flex items-start justify-between">
-            <div>
-              <div class="text-lg font-bold" style="color:var(--accent-cyan);">${escapeHtml(name || 'ไม่ระบุ')}</div>
-              <div class="text-xs opacity-50 mt-0.5">ค่าหัว: <span class="font-semibold" style="color:#ffaa00;">${escapeHtml(bounty || '-')}</span></div>
-              ${testedAt}
-            </div>
-            <div class="text-right">
-              <div class="text-3xl font-black" style="font-family:'Orbitron',sans-serif;color:${statusColor};">${total}</div>
-              <div class="text-[10px] opacity-40">/ ${MAX_TOTAL}</div>
-            </div>
-          </div>
-
-          <div class="px-3 py-2 rounded-lg text-sm font-semibold text-center" style="background:${statusBg};border:1px solid ${statusBorder};color:${statusColor};">
-            ${statusText} (เกณฑ์ผ่าน: ${PASS_THRESHOLD}+)
-          </div>
-
-          <div class="space-y-2.5">
-            <div class="text-xs font-bold uppercase tracking-wider opacity-50">รายละเอียดคะแนน</div>
-            ${breakdownHTML}
-          </div>
-
-          ${deleteSection}
-        </div>
-      `;
-    }
-
-    function escapeHtml(str) {
-      const div = document.createElement('div');
-      div.textContent = str;
-      return div.innerHTML;
-    }
-
-    // ========== TAB SWITCHING ==========
-    function switchTab(tab) {
-      currentTab = tab;
-      const formSection = document.getElementById('section-form');
-      const historySection = document.getElementById('section-history');
-      const tabForm = document.getElementById('tab-form');
-      const tabHistory = document.getElementById('tab-history');
-
-      if (tab === 'form') {
-        formSection.classList.remove('hidden');
-        historySection.classList.add('hidden');
-        tabForm.style.color = 'var(--accent-cyan)';
-        tabForm.style.borderBottom = '3px solid var(--accent-cyan)';
-        tabHistory.style.color = 'rgba(232,230,240,0.5)';
-        tabHistory.style.borderBottom = '3px solid transparent';
-      } else {
-        formSection.classList.add('hidden');
-        historySection.classList.remove('hidden');
-        tabHistory.style.color = 'var(--accent-cyan)';
-        tabHistory.style.borderBottom = '3px solid var(--accent-cyan)';
-        tabForm.style.color = 'rgba(232,230,240,0.5)';
-        tabForm.style.borderBottom = '3px solid transparent';
-      }
-    }
-
-    // ========== TOAST ==========
-    function showToast(message, type = 'success') {
-      const container = document.getElementById('toast-container');
-      const toast = document.createElement('div');
-      toast.className = `toast toast-${type}`;
-      toast.textContent = message;
-      container.appendChild(toast);
-      setTimeout(() => {
-        toast.style.opacity = '0';
-        toast.style.transition = 'opacity 0.3s';
-        setTimeout(() => toast.remove(), 300);
-      }, 3000);
-    }
-
-    // ========== DELETE CONFIRMATION ==========
-    function confirmDelete(backendId) {
-      const btn = document.getElementById(`del-btn-${backendId}`);
-      if (!btn) return;
-      const parent = btn.parentElement;
-      parent.innerHTML = `
-        <span class="text-xs opacity-60 mr-2">ยืนยันลบ?</span>
-        <button class="delete-confirm-btn" onclick="doDelete('${backendId}')">ลบเลย</button>
-        <button class="delete-cancel-btn ml-1" onclick="cancelDelete('${backendId}')">ยกเลิก</button>
-      `;
-    }
-
-    function cancelDelete(backendId) {
-      // Re-render the delete button
-      renderHistory(allRecords);
-    }
-
-    async function doDelete(backendId) {
-      const record = allRecords.find(r => r.__backendId === backendId);
-      if (!record) return;
-
-      // Show loading
-      const parent = document.querySelector(`[onclick="doDelete('${backendId}')"]`);
-      if (parent && parent.parentElement) {
-        parent.parentElement.innerHTML = '<span class="text-xs opacity-60">กำลังลบ...</span>';
-      }
-
-      const result = await window.dataSdk.delete(record);
-      if (result.isOk) {
-        showToast('ลบสำเร็จ!', 'success');
-      } else {
-        showToast('ลบไม่สำเร็จกรุณาลองใหม่', 'error');
-        renderHistory(allRecords);
-      }
-    }
-
-    // ========== SUBMIT ==========
-    async function handleSubmit(e) {
-      e.preventDefault();
-      if (isSubmitting) return;
-
-      const name = document.getElementById('roblox-name').value.trim();
-      const bounty = document.getElementById('bounty').value.trim();
-
-      if (!name) {
-        showToast('กรุณาใส่ชื่อ Roblox', 'error');
-        return;
-      }
-      if (!bounty) {
-        showToast('กรุณาใส่ค่าหัว', 'error');
-        return;
-      }
-
-      if (allRecords.length >= 999) {
-        showToast('⚠️ จำนวนข้อมูลเต็มแล้ว (999) กรุณาลบบางรายการก่อน', 'error');
-        return;
-      }
-
-      isSubmitting = true;
-      const btn = document.getElementById('submit-btn');
-      btn.textContent = 'กำลังบันทึก...';
-      btn.style.opacity = '0.6';
-      btn.disabled = true;
-
-      const scores = {};
-      let total = 0;
-      CATEGORIES.forEach(cat => {
-        const val = parseInt(document.getElementById(`slider-${cat.key}`).value) || 0;
-        scores[cat.key] = val;
-        total += val;
-      });
-
-      const record = {
-        roblox_name: name,
-        bounty: bounty,
-        score_ken: scores.score_ken,
-        score_observation: scores.score_observation,
-        score_skill: scores.score_skill,
-        score_survival: scores.score_survival,
-        score_resource: scores.score_resource,
-        score_combo: scores.score_combo,
-        score_decision: scores.score_decision,
-        total_score: total,
-        passed: total >= PASS_THRESHOLD,
-        tested_at: new Date().toISOString()
-      };
-
-      const result = await window.dataSdk.create(record);
-      if (result.isOk) {
-        showToast(`บันทึกผลสำเร็จ! ${total >= PASS_THRESHOLD ? '✅ ผ่าน' : '❌ ไม่ผ่าน'}`, 'success');
-        // Reset form
-        document.getElementById('roblox-name').value = '';
-        document.getElementById('bounty').value = '';
         CATEGORIES.forEach(cat => {
-          const slider = document.getElementById(`slider-${cat.key}`);
-          if (slider) slider.value = 0;
-          const valEl = document.getElementById(`val-${cat.key}`);
-          if (valEl) valEl.textContent = '0';
+
+            const value =
+                Number(document.getElementById("val-" + cat.key).innerText);
+
+            total += value;
         });
-        updateTotal();
-      } else {
-        showToast('บันทึกไม่สำเร็จ กรุณาลองใหม่', 'error');
-      }
 
-      btn.textContent = 'บันทึก';
-      btn.style.opacity = '1';
-      btn.disabled = false;
-      isSubmitting = false;
+        document.getElementById("total").innerText = total;
     }
 
-    // ========== RENDER HISTORY ==========
-    function renderHistory(data) {
-      const container = document.getElementById('history-list');
-      const countEl = document.getElementById('history-count');
-      if (countEl) countEl.textContent = data.length;
 
-      if (data.length === 0) {
-        container.innerHTML = `
-          <div class="text-center py-12 opacity-40">
-            <div class="text-4xl mb-3">📋</div>
-            <p class="text-sm">ยังไม่มีประวัติการเทส</p>
-          </div>
-        `;
-        return;
-      }
+    // ================= DISCORD WEBHOOK SEND =================
 
-      // Sort by newest first
-      const sorted = [...data].sort((a, b) => {
-        const dateA = a.tested_at ? new Date(a.tested_at).getTime() : 0;
-        const dateB = b.tested_at ? new Date(b.tested_at).getTime() : 0;
-        return dateB - dateA;
-      });
+    async function sendToDiscord(record) {
 
-      // Stats
-      const passCount = sorted.filter(r => r.passed).length;
-      const failCount = sorted.length - passCount;
-      const avgScore = sorted.length > 0
-        ? (sorted.reduce((s, r) => s + (r.total_score || 0), 0) / sorted.length).toFixed(1)
-        : 0;
+        const now = Date.now();
 
-      // Track existing elements for efficient updates
-      const existingCards = new Map(
-        [...container.querySelectorAll('[data-record-id]')].map(el => [el.dataset.recordId, el])
-      );
-
-      // Build new content
-      let newHTML = `
-        <div class="grid grid-cols-3 gap-3 mb-5">
-          <div class="rounded-xl p-4 text-center" style="background:rgba(19,19,43,0.7);border:1px solid rgba(255,255,255,0.06);">
-            <div class="text-2xl font-black" style="font-family:'Orbitron',sans-serif;color:var(--accent-cyan);">${sorted.length}</div>
-            <div class="text-[10px] opacity-50 mt-1">ทั้งหมด</div>
-          </div>
-          <div class="rounded-xl p-4 text-center" style="background:rgba(0,255,136,0.05);border:1px solid rgba(0,255,136,0.15);">
-            <div class="text-2xl font-black" style="font-family:'Orbitron',sans-serif;color:#00ff88;">${passCount}</div>
-            <div class="text-[10px] opacity-50 mt-1">ผ่าน</div>
-          </div>
-          <div class="rounded-xl p-4 text-center" style="background:rgba(255,45,85,0.05);border:1px solid rgba(255,45,85,0.15);">
-            <div class="text-2xl font-black" style="font-family:'Orbitron',sans-serif;color:#ff2d55;">${failCount}</div>
-            <div class="text-[10px] opacity-50 mt-1">ไม่ผ่าน</div>
-          </div>
-        </div>
-        <div class="text-xs opacity-40 mb-3 text-center">คะแนนเฉลี่ย: ${avgScore} / ${MAX_TOTAL}</div>
-      `;
-
-      sorted.forEach(record => {
-        const scores = {
-          score_ken: record.score_ken || 0,
-          score_observation: record.score_observation || 0,
-          score_skill: record.score_skill || 0,
-          score_survival: record.score_survival || 0,
-          score_resource: record.score_resource || 0,
-          score_combo: record.score_combo || 0,
-          score_decision: record.score_decision || 0
-        };
-        newHTML += `<div data-record-id="${record.__backendId}" class="mb-4">${buildResultCard(
-          record.roblox_name,
-          record.bounty,
-          scores,
-          record.total_score || 0,
-          record.passed,
-          true,
-          record
-        )}</div>`;
-      });
-
-      container.innerHTML = newHTML;
-    }
-
-    // ========== DATA SDK ==========
-    const dataHandler = {
-      onDataChanged(data) {
-        allRecords = data;
-        renderHistory(data);
-      }
-    };
-
-    async function initApp() {
-      buildSliders();
-      updateTotal();
-
-      if (window.dataSdk) {
-        const result = await window.dataSdk.init(dataHandler);
-        if (!result.isOk) {
-          console.error('Data SDK init failed');
-          showToast('เชื่อมต่อข้อมูลไม่สำเร็จ', 'error');
+        if (now - lastSendTime < WEBHOOK_COOLDOWN * 1000) {
+            console.log("Webhook cooldown active");
+            return;
         }
-      }
+
+        lastSendTime = now;
+
+        try {
+
+            await fetch(DISCORD_WEBHOOK, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+
+                    content: `<@&${DISCORD_ROLE_ID}>`,
+
+                    embeds: [
+                        {
+                            title: "📋 ผลการเทสเข้าแคลน",
+
+                            color:
+                                record.passed
+                                    ? 0x00ff88
+                                    : 0xff2d55,
+
+                            fields: [
+
+                                {
+                                    name: "👤 ผู้เล่น",
+                                    value: record.roblox_name,
+                                    inline: true
+                                },
+
+                                {
+                                    name: "💰 Bounty",
+                                    value: record.bounty,
+                                    inline: true
+                                },
+
+                                {
+                                    name: "🎯 คะแนนรวม",
+                                    value: record.total + " / 100"
+                                },
+
+                                {
+                                    name: "👁️ เคน",
+                                    value: String(record.score_ken),
+                                    inline: true
+                                },
+
+                                {
+                                    name: "🔮 โซติดตัว",
+                                    value: String(record.score_observation),
+                                    inline: true
+                                },
+
+                                {
+                                    name: "🎯 สกิล",
+                                    value: String(record.score_skill),
+                                    inline: true
+                                },
+
+                                {
+                                    name: "🛡️ เอาตัวรอด",
+                                    value: String(record.score_survival),
+                                    inline: true
+                                },
+
+                                {
+                                    name: "💎 ใช้ของ",
+                                    value: String(record.score_resource),
+                                    inline: true
+                                },
+
+                                {
+                                    name: "⚡ คอมโบ",
+                                    value: String(record.score_combo),
+                                    inline: true
+                                },
+
+                                {
+                                    name: "🧠 ตัดสินใจ",
+                                    value: String(record.score_decision),
+                                    inline: true
+                                },
+
+                                {
+                                    name: "📊 ผลลัพธ์",
+                                    value:
+                                        record.passed
+                                            ? "✅ ผ่าน"
+                                            : "❌ ไม่ผ่าน"
+                                }
+
+                            ],
+
+                            timestamp: new Date().toISOString()
+                        }
+                    ]
+
+                })
+            });
+
+        } catch (err) {
+
+            console.log("Discord Error", err);
+        }
     }
 
-    initApp();
-  </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9cb7b2c6940cd969',t:'MTc3MDY4NTUyOC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+
+    // ================= SUBMIT =================
+
+    function handleSubmit(e) {
+
+        e.preventDefault();
+
+        const name =
+            document.getElementById("roblox-name").value.trim();
+
+        const bounty =
+            document.getElementById("bounty").value.trim();
+
+        if (!name || !bounty) {
+            alert("กรอกข้อมูลให้ครบก่อน");
+            return;
+        }
+
+        let total = 0;
+        let scores = {};
+
+        CATEGORIES.forEach(cat => {
+
+            const value =
+                Number(document.getElementById("val-" + cat.key).innerText);
+
+            scores[cat.key] = value;
+            total += value;
+        });
+
+        const record = {
+
+            roblox_name: name,
+            bounty: bounty,
+            total: total,
+
+            passed:
+                total >= PASS_THRESHOLD,
+
+            ...scores
+        };
+
+        sendToDiscord(record);
+
+        alert("✅ ส่ง Discord แล้ว");
+    }
+
+</script>
+
+</body>
 </html>
