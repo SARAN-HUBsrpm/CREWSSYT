@@ -33,12 +33,20 @@
             class="w-full p-3 rounded bg-black border border-gray-700"
             placeholder="Bounty">
 
-        <!-- ⭐ เพิ่มช่องใหม่ -->
+        <!-- ⭐ ชนะกี่รอบ -->
         <input id="test-wins"
             type="number"
             min="0"
+            max="10"
             class="w-full p-3 rounded bg-black border border-gray-700"
-            placeholder="เทสชนะกี่รอบ (เช่น 5)">
+            placeholder="ชนะกี่รอบ (ไม่เกิน 10)">
+
+        <!-- ⭐ เทสทั้งหมดกี่รอบ -->
+        <input id="test-total"
+            type="number"
+            min="0"
+            class="w-full p-3 rounded bg-black border border-gray-700"
+            placeholder="เทสทั้งหมดกี่รอบ (เช่น 10)">
 
         <!-- Sliders -->
         <div id="sliders"></div>
@@ -163,8 +171,11 @@
                             { name: "👤 ผู้เล่น", value: record.roblox_name, inline: true },
                             { name: "💰 Bounty", value: record.bounty, inline: true },
 
-                            // ⭐ เพิ่มตรงนี้
-                            { name: "🏆 ชนะการเทส", value: record.test_wins + " รอบ", inline: true },
+                            {
+                                name: "🏆 ผลการเทส",
+                                value: `ชนะ ${record.test_wins} / เทส ${record.test_total}`,
+                                inline: true
+                            },
 
                             { name: "🎯 คะแนนรวม", value: record.total + " / 100" },
 
@@ -207,13 +218,30 @@
         const bounty =
             document.getElementById("bounty").value.trim();
 
-        const testWins =
-            document.getElementById("test-wins").value || 0;
+        let testWins =
+            Number(document.getElementById("test-wins").value || 0);
+
+        let testTotal =
+            Number(document.getElementById("test-total").value || 0);
+
 
         if (!name || !bounty) {
             alert("กรอกข้อมูลให้ครบก่อน");
             return;
         }
+
+        // ⭐ ลิมิตชนะไม่เกิน 10
+        if (testWins > 10) {
+            alert("ชนะได้ไม่เกิน 10 รอบ");
+            return;
+        }
+
+        // ⭐ กันชนะมากกว่าเทส
+        if (testWins > testTotal) {
+            alert("ชนะห้ามมากกว่าจำนวนเทส");
+            return;
+        }
+
 
         let total = 0;
         let scores = {};
@@ -231,6 +259,7 @@
             roblox_name: name,
             bounty: bounty,
             test_wins: testWins,
+            test_total: testTotal,
             total: total,
             passed: total >= PASS_THRESHOLD,
             ...scores
