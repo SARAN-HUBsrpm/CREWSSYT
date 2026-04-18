@@ -125,7 +125,7 @@ textarea{
 const API = "https://opensheet.elk.sh/1L27Z6gjEPd4FHEkDvQ_oq1JiupQMTVvdLXegG1GQd-8/Form_Responses";
 
 // 🔥 Webhook
-const WEBHOOK = "https://discord.com/api/webhooks/1470701672174190675/7sZp7dNpq0gJ3un7TY8w6-zVCsohiZ7YNoH9iW6J8D9aompqsREkdfvlGE5LiskRzEhE";
+const WEBHOOK = "https://discord.com/api/webhooks/1495146103807672401/FFLZQ-Vz_GVqHz2y7Fr5GL5pxsa8apkIVvr8hp8_sowlPvxzqzjkNXILJIta4gVAFFam";
 
 let players = [];
 
@@ -217,6 +217,7 @@ function submitScore(){
     method:"POST",
     headers:{ "Content-Type":"application/json" },
     body:JSON.stringify({
+      content: "@here",
       embeds:[{
         title:"📋 ผลการเทสเข้าแคลน",
         color: pass==="ผ่าน" ? 65280 : 16711680,
