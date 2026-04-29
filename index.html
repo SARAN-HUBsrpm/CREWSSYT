@@ -105,7 +105,7 @@ textarea{
 <option>1smesayo From Crew [KMG]</option>
 <option>NeeraTea From Crew [KMG]</option>
 <option>Jdai From Crew [KMG]</option>
-<option>Ko From Crew [KOG]</option>
+<option>Rin From Crew [DA]</option>
 <option>Yuri From Crew [KOG]</option>
 <option>NOTHING From Crew [?]</option>
 </select>
@@ -150,6 +150,7 @@ document.getElementById("playerSelect").onchange=function(){
   const p=players[this.value];
 
   document.getElementById("infoBox").innerHTML=`
+  💬 Discord: ${p["ชื่อDC"]}<br>
   👤 ชื่อ: ${p["ชื่อเล่น"]}<br>
   🎮 Roblox: ${p["ชื่อ Roblox เช่น @SaranRTDJ"]}<br>
   💰 ค่าหัว: ${p["ค่าหัวเท่าไหร่ ตอบเช่น 30M 29.9M 25M"]}<br>
@@ -223,6 +224,7 @@ function submitScore(){
         color: pass==="ผ่าน" ? 65280 : 16711680,
         description:
 `👤 ผู้เล่น: ${p["ชื่อ Roblox เช่น @SaranRTDJ"]}
+💬 Discord: ${p["ชื่อDC"]}
 💰 Bounty: ${p["ค่าหัวเท่าไหร่ ตอบเช่น 30M 29.9M 25M"]}
 
 📝 เหตุผล: ${p["สาเหตุที่อยากเข้า"]}
