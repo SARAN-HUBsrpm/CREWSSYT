@@ -204,7 +204,7 @@ function submitScore(){
   const p = players[document.getElementById("playerSelect").value];
   const total = Number(document.getElementById("total").innerText);
 
-  const pass = total >= 41 ? "ผ่าน" : "ไม่ผ่าน";
+  const pass = total >= 40 ? "ผ่าน" : "ไม่ผ่าน";
 
   // 🔥 เพิ่มใหม่
   const passCount = document.getElementById("passCount").value;
